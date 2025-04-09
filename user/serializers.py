@@ -20,6 +20,19 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {'senha': {'write_only': True}}
 
+    def validate_foto_perfil(self, value):
+        # Tipos de imagem permitidos
+        valid_types = ['image/jpeg', 'image/png', 'image/jpg']
+        if hasattr(value, 'content_type') and value.content_type not in valid_types:
+            raise serializers.ValidationError("A imagem deve ser do tipo JPEG ou PNG.")
+
+        # Tamanho máximo: 5MB
+        max_size = 5 * 1024 * 1024  # 5 megabytes
+        if value.size > max_size:
+            raise serializers.ValidationError("A imagem não pode ser maior que 5MB.")
+
+        return value
+
     def create(self, validated_data):
         nome_completo = validated_data.pop("nome", "")
         partes = nome_completo.split()

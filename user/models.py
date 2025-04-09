@@ -1,5 +1,13 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+import uuid
+import os
+
+def upload_foto_perfil(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{uuid.uuid4()}.{ext}"
+    return os.path.join('perfil/', filename)
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, senha=None, **extra_fields):
@@ -38,6 +46,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     cidade = models.CharField(max_length=100, blank=True, null=True)
     estado = models.CharField(max_length=100, blank=True, null=True)
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES)
+
+    perfil = models.ImageField(
+        upload_to=upload_foto_perfil,
+        blank=True,
+        null=True
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
